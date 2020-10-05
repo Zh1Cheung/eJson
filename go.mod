@@ -3,7 +3,6 @@ module github.com/Zh1Cheung/eJson
 go 1.15
 
 require (
-	github.com/Zh1Cheung/eMatch v1.0.1
-	github.com/Zh1Cheung/eFormat v1.0.2
-
+	github.com/mailru/easyjson v0.7.6
+	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7
 )
