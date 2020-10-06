@@ -20,10 +20,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1e800c1a-28ab-4ba9-b500-10faf012b984" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/eJson.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/eJson_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/eJson.go" beforeDir="false" afterPath="$PROJECT_DIR$/eJson.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eJson_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/eJson_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,11 +48,14 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="configurable.Global.GOPATH.is.expanded" value="true" />
+    <property name="configurable.Module.GOPATH.is.expanded" value="false" />
+    <property name="configurable.Project.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="go.vgo" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -62,7 +65,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.BenchmarkFFJSONLexer in eJson_test.go (1)">
+  <component name="RunManager" selected="Go Test.go test eJson">
     <configuration name="BenchmarkFFJSONLexer in eJson_test.go (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="eJson" />
       <working_directory value="$PROJECT_DIR$" />
@@ -93,7 +96,7 @@
       <pattern value="^\QTestLess\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestRandomData in eJson_test.go (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestRandomData in eJson_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="eJson" />
       <working_directory value="$PROJECT_DIR$" />
       <framework value="gotest" />
@@ -103,23 +106,22 @@
       <pattern value="^\QTestRandomData\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestRandomValidStrings in eJson_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="go test eJson" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="eJson" />
       <working_directory value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <kind value="FILE" />
+      <kind value="DIRECTORY" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/eJson_test.go" />
-      <pattern value="^\QTestRandomValidStrings\E$" />
+      <filePath value="$PROJECT_DIR$" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.go test eJson" />
+        <item itemvalue="Go Test.TestRandomData in eJson_test.go" />
         <item itemvalue="Go Test.BenchmarkFFJSONLexer in eJson_test.go (1)" />
         <item itemvalue="Go Test.BenchmarkFFJSONLexer in eJson_test.go" />
         <item itemvalue="Go Test.TestLess in eJson_test.go" />
-        <item itemvalue="Go Test.TestRandomValidStrings in eJson_test.go" />
-        <item itemvalue="Go Test.TestRandomData in eJson_test.go (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -142,6 +144,9 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
+  <component name="VgoProject">
+    <integration-enabled>true</integration-enabled>
+  </component>
   <component name="WindowStateProjectService">
     <state x="671" y="378" key="#Go_Modules" timestamp="1601858093276">
       <screen x="0" y="23" width="1792" height="1025" />
@@ -151,26 +156,26 @@
       <screen x="0" y="23" width="1792" height="1025" />
     </state>
     <state x="621" y="344" key="#com.intellij.fileTypes.FileTypeChooser/0.23.1792.1025@0.23.1792.1025" timestamp="1601859225526" />
-    <state width="1364" height="279" key="GridCell.Tab.0.bottom" timestamp="1601867304963">
+    <state width="1364" height="279" key="GridCell.Tab.0.bottom" timestamp="1601901928637">
       <screen x="0" y="23" width="1792" height="1025" />
     </state>
-    <state width="1364" height="279" key="GridCell.Tab.0.bottom/0.23.1792.1025@0.23.1792.1025" timestamp="1601867304963" />
-    <state width="1364" height="279" key="GridCell.Tab.0.center" timestamp="1601867304963">
+    <state width="1364" height="279" key="GridCell.Tab.0.bottom/0.23.1792.1025@0.23.1792.1025" timestamp="1601901928637" />
+    <state width="1364" height="279" key="GridCell.Tab.0.center" timestamp="1601901928636">
       <screen x="0" y="23" width="1792" height="1025" />
     </state>
-    <state width="1364" height="279" key="GridCell.Tab.0.center/0.23.1792.1025@0.23.1792.1025" timestamp="1601867304963" />
-    <state width="1364" height="279" key="GridCell.Tab.0.left" timestamp="1601867304962">
+    <state width="1364" height="279" key="GridCell.Tab.0.center/0.23.1792.1025@0.23.1792.1025" timestamp="1601901928636" />
+    <state width="1364" height="279" key="GridCell.Tab.0.left" timestamp="1601901928636">
       <screen x="0" y="23" width="1792" height="1025" />
     </state>
-    <state width="1364" height="279" key="GridCell.Tab.0.left/0.23.1792.1025@0.23.1792.1025" timestamp="1601867304962" />
-    <state width="1364" height="279" key="GridCell.Tab.0.right" timestamp="1601867304963">
+    <state width="1364" height="279" key="GridCell.Tab.0.left/0.23.1792.1025@0.23.1792.1025" timestamp="1601901928636" />
+    <state width="1364" height="279" key="GridCell.Tab.0.right" timestamp="1601901928637">
       <screen x="0" y="23" width="1792" height="1025" />
     </state>
-    <state width="1364" height="279" key="GridCell.Tab.0.right/0.23.1792.1025@0.23.1792.1025" timestamp="1601867304963" />
-    <state x="373" y="176" key="SettingsEditor" timestamp="1601857333393">
+    <state width="1364" height="279" key="GridCell.Tab.0.right/0.23.1792.1025@0.23.1792.1025" timestamp="1601901928637" />
+    <state x="373" y="176" key="SettingsEditor" timestamp="1601907314610">
       <screen x="0" y="23" width="1792" height="1025" />
     </state>
-    <state x="373" y="176" key="SettingsEditor/0.23.1792.1025@0.23.1792.1025" timestamp="1601857333393" />
+    <state x="373" y="176" key="SettingsEditor/0.23.1792.1025@0.23.1792.1025" timestamp="1601907314610" />
     <state x="514" y="252" width="604" height="548" key="find.popup" timestamp="1601867268711">
       <screen x="0" y="23" width="1792" height="1025" />
     </state>

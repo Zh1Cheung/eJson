@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"encoding/hex"
 	"encoding/json"
+	"github.com/mailru/easyjson/jlexer"
+	fflib "github.com/pquerna/ffjson/fflib/v1"
 	"io"
 	"math/rand"
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/mailru/easyjson/jlexer"
-	fflib "github.com/pquerna/ffjson/fflib/v1"
 )
 
 func TestRandomData(t *testing.T) {

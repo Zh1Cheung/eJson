@@ -1,4 +1,3 @@
-
 package eJson
 
 import "strconv"

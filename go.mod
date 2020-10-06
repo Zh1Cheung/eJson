@@ -1,4 +1,4 @@
-module github.com/Zh1Cheung/eJson
+module eJson
 
 go 1.15
 
