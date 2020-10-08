@@ -1,6 +1,8 @@
 package eJson
 
-import "strconv"
+import (
+	"strconv"
+)
 
 type Type byte
 
@@ -91,7 +93,6 @@ func Get(json string, path string) Result {
 	var stypes = make([]byte, 0, 4)
 	var counts = make([]int, 0, 4)
 
-
 	if len(path) == 0 {
 		return Result{} // nothing
 	}
@@ -132,7 +133,6 @@ func Get(json string, path string) Result {
 	}
 	parts = append(parts, path[s:])
 	wilds = append(wilds, wild)
-
 
 read_key:
 	if stype == '[' {
