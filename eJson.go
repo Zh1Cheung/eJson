@@ -21,6 +21,7 @@ const (
 	JSON
 )
 
+// Result represents a json value that is returned from Get().
 type Result struct {
 	// Type is the json type
 	Type Type
@@ -32,6 +33,7 @@ type Result struct {
 	Num float64
 }
 
+// String returns a string representation of the value.
 func (t Result) String() string {
 	switch t.Type {
 	default:
@@ -66,36 +68,46 @@ func (t Result) Value() interface{} {
 	}
 }
 
-//  {
-//    "name": {"first": "Tom", "last": "Anderson"},
-//    "age":37,
-//    "children": ["Sara","Alex","Jack"]
-//  }
-//  "name.last"          >> "Anderson"
-//  "age"                >> 37
-//  "children.#"         >> 3
-//  "children.1"         >> "Alex"
-//  "child*.2"           >> "Jack"
-//  "c?ildren.0"         >> "Sara"
-//
+type part struct {
+	wild bool
+	key  string
+}
+
+type frame struct {
+	key   string
+	count int
+	stype byte
+}
 
 func Get(json string, path string) Result {
-	var i, s, depth int
-	var squashed string
-	var key string
-	var stype byte
-	var count int
+	var s int
 	var wild bool
-	var matched bool
-	var parts = make([]string, 0, 4)
-	var wilds = make([]bool, 0, 4)
-	var keys = make([]string, 0, 4)
-	var stypes = make([]byte, 0, 4)
-	var counts = make([]int, 0, 4)
+	var parts = make([]part, 0, 4)
 
+	// do nothing when no path specified
 	if len(path) == 0 {
 		return Result{} // nothing
 	}
+
+	// parse the path. just split on the dot
+	for i := 0; i < len(path); i++ {
+		if path[i] == '.' {
+			parts = append(parts, part{wild: wild, key: path[s:i]})
+			if wild {
+				wild = false
+			}
+			s = i + 1
+		} else if path[i] == '*' || path[i] == '?' {
+			wild = true
+		}
+	}
+	parts = append(parts, part{wild: wild, key: path[s:]})
+
+	var i, depth int
+	var squashed string
+	var f frame
+	var matched bool
+	var stack = make([]frame, 0, 4)
 
 	depth = 1
 
@@ -103,9 +115,9 @@ func Get(json string, path string) Result {
 	for ; i < len(json); i++ {
 		if json[i] > ' ' {
 			if json[i] == '{' {
-				stype = '{'
+				f.stype = '{'
 			} else if json[i] == '[' {
-				stype = '['
+				f.stype = '['
 			} else {
 				// not a valid type
 				return Result{}
@@ -115,37 +127,23 @@ func Get(json string, path string) Result {
 		}
 	}
 
-	stypes = append(stypes, stype)
-	counts = append(counts, count)
-
-	// parse the path. just split on the dot
-	for i := 0; i < len(path); i++ {
-		if path[i] == '.' {
-			parts = append(parts, path[s:i])
-			wilds = append(wilds, wild)
-			if wild {
-				wild = false
-			}
-			s = i + 1
-		} else if path[i] == '*' || path[i] == '?' {
-			wild = true
-		}
-	}
-	parts = append(parts, path[s:])
-	wilds = append(wilds, wild)
+	stack = append(stack, f)
 
 read_key:
-	if stype == '[' {
-		key = strconv.FormatInt(int64(count), 10)
-		count++
+	if f.stype == '[' {
+		f.key = strconv.FormatInt(int64(f.count), 10)
+		f.count++
 	} else {
 		for ; i < len(json); i++ {
 			if json[i] == '"' {
+				//read to end of key
 				i++
+				// readstr
+				// the first double-quote has already been read
 				s = i
 				for ; i < len(json); i++ {
 					if json[i] == '"' {
-						key = json[s:i]
+						f.key = json[s:i]
 						i++
 						break
 					}
@@ -169,7 +167,7 @@ read_key:
 								break
 							}
 						}
-						key = unescape(json[s:i])
+						f.key = unescape(json[s:i])
 						i++
 						break
 					}
@@ -178,12 +176,18 @@ read_key:
 			}
 		}
 	}
-	if wilds[depth-1] {
-		matched = wildcardMatch(key, parts[depth-1])
+	// end readstr
+
+	// we have a brand new key.
+	// is it the key that we are looking for?
+	if parts[depth-1].wild {
+		// it's a wildcard path element
+		matched = wildcardMatch(f.key, parts[depth-1].key)
 	} else {
-		matched = parts[depth-1] == key
+		matched = parts[depth-1].key == f.key
 	}
 
+	// read to the value token
 	var val string
 	var vc byte
 	for ; i < len(json); i++ {
@@ -193,6 +197,7 @@ read_key:
 			s = i
 			i++
 			for ; i < len(json); i++ {
+				// let's pick up any character. it doesn't matter.
 				if json[i] < 'a' || json[i] > 'z' {
 					break
 				}
@@ -209,6 +214,7 @@ read_key:
 			goto proc_delim
 		case '"': // string
 			i++
+			// we read the val below
 			vc = '"'
 			goto proc_val
 		case '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9': // number
@@ -236,7 +242,9 @@ read_key:
 
 proc_delim:
 	if (matched && depth == len(parts)) || !matched {
+		// squash the value, ignoring all nested arrays and objects.
 		s = i - 1
+		// the first '[' or '{' has already been read
 		depth := 1
 		for ; i < len(json); i++ {
 			if json[i] == '{' || json[i] == '[' {
@@ -337,11 +345,12 @@ proc_val:
 				value.Num, _ = strconv.ParseFloat(val, 64)
 			}
 			return value
+			//} else if vc != '{' {
+			//  can only deep search objects
+			//	return Result{}
 		} else {
-			stype = vc
-			keys = append(keys, key)
-			stypes = append(stypes, stype)
-			counts = append(counts, count)
+			f.stype = vc
+			stack = append(stack, f)
 			depth++
 			goto read_key
 		}
@@ -377,19 +386,16 @@ proc_val:
 	for ; i < len(json); i++ {
 		switch json[i] {
 		case '}', ']':
-			if parts[depth-1] == "#" {
-				return Result{Type: Number, Num: float64(count)}
+			if parts[depth-1].key == "#" {
+				return Result{Type: Number, Num: float64(f.count)}
 			}
 			// step the stack back
 			depth--
 			if depth == 0 {
 				return Result{}
 			}
-			keys = keys[:len(keys)-1]
-			stypes = stypes[:len(stypes)-1]
-			counts = counts[:len(counts)-1]
-			stype = stypes[len(stypes)-1]
-			count = counts[len(counts)-1]
+			stack = stack[:len(stack)-1]
+			f = stack[len(stack)-1]
 		case ',':
 			i++
 			goto read_key
@@ -398,7 +404,6 @@ proc_val:
 	return Result{}
 }
 
-// unescape unescapes a string
 func unescape(json string) string { //, error) {
 	var str = make([]byte, 0, len(json))
 	for i := 0; i < len(json); i++ {
@@ -450,7 +455,7 @@ func unescape(json string) string { //, error) {
 						code += (int(json[j]) - 'a' + 10) << uint(12-(j-i)*4)
 					}
 				}
-				str = append(str, []byte(string(rune(code)))...)
+				str = append(str, []byte(string(code))...)
 				i += 3 // only 3 because we will increment on the for-loop
 			}
 		}
@@ -458,12 +463,6 @@ func unescape(json string) string { //, error) {
 	return string(str) //, nil
 }
 
-// Less return true if a token is less than another token.
-// The caseSensitive paramater is used when the tokens are Strings.
-// The order when comparing two different type is:
-//
-//  Null < False < Number < String < True < JSON
-//
 func (t Result) Less(token Result, caseSensitive bool) bool {
 	if t.Type < token.Type {
 		return true
@@ -521,9 +520,6 @@ func stringLessInsensitive(a, b string) bool {
 	return len(a) < len(b)
 }
 
-// wilcardMatch returns true if str matches pattern. This is a very
-// simple wildcard match where '*' matches on any number characters
-// and '?' matches on any one character.
 func wildcardMatch(str, pattern string) bool {
 	if pattern == "*" {
 		return true
