@@ -19,9 +19,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1e800c1a-28ab-4ba9-b500-10faf012b984" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/eJson.go" beforeDir="false" afterPath="$PROJECT_DIR$/eJson.go" afterDir="false" />
-    </list>
+    <list default="true" id="1e800c1a-28ab-4ba9-b500-10faf012b984" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -173,10 +171,10 @@
       <screen x="0" y="23" width="1792" height="1025" />
     </state>
     <state x="373" y="176" key="SettingsEditor/0.23.1792.1025@0.23.1792.1025" timestamp="1601907314610" />
-    <state x="514" y="252" width="604" height="548" key="find.popup" timestamp="1601867268711">
+    <state x="514" y="252" width="604" height="548" key="find.popup" timestamp="1602685034332">
       <screen x="0" y="23" width="1792" height="1025" />
     </state>
-    <state x="514" y="252" width="604" height="548" key="find.popup/0.23.1792.1025@0.23.1792.1025" timestamp="1601867268711" />
+    <state x="514" y="252" width="604" height="548" key="find.popup/0.23.1792.1025@0.23.1792.1025" timestamp="1602685034332" />
     <state x="536" y="252" width="670" height="676" key="search.everywhere.popup" timestamp="1601858606429">
       <screen x="0" y="23" width="1792" height="1025" />
     </state>
