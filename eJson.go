@@ -1,8 +1,6 @@
 package eJson
 
-import (
-	"strconv"
-)
+import "strconv"
 
 type Type byte
 
@@ -51,6 +49,14 @@ func (t Result) String() string {
 	}
 }
 
+// Value returns one of these types:
+//
+//	bool, for JSON booleans
+//	float64, for JSON numbers
+//	Number, for JSON numbers
+//	string, for JSON string literals
+//	nil, for JSON null
+//
 func (t Result) Value() interface{} {
 	switch t.Type {
 	default:
@@ -79,6 +85,22 @@ type frame struct {
 	stype byte
 }
 
+// A path is a series of keys seperated by a dot.
+// A key may contain special wildcard characters '*' and '?'.
+// To access an array value use the index as the key.
+// To get the number of elements in an array use the '#' character.
+//  {
+//    "name": {"first": "Tom", "last": "Anderson"},
+//    "age":37,
+//    "children": ["Sara","Alex","Jack"]
+//  }
+//  "name.last"          >> "Anderson"
+//  "age"                >> 37
+//  "children.#"         >> 3
+//  "children.1"         >> "Alex"
+//  "child*.2"           >> "Jack"
+//  "c?ildren.0"         >> "Sara"
+//
 func Get(json string, path string) Result {
 	var s int
 	var wild bool
@@ -91,7 +113,38 @@ func Get(json string, path string) Result {
 
 	// parse the path. just split on the dot
 	for i := 0; i < len(path); i++ {
-		if path[i] == '.' {
+	next_part:
+		if path[i] == '\\' {
+			// go into escape mode
+			epart := []byte(path[s:i])
+			i++
+			if i < len(path) {
+				epart = append(epart, path[i])
+				i++
+				for ; i < len(path); i++ {
+					if path[i] == '\\' {
+						i++
+						if i < len(path) {
+							epart = append(epart, path[i])
+						}
+						continue
+					} else if path[i] == '.' {
+						parts = append(parts, part{wild: wild, key: string(epart)})
+						if wild {
+							wild = false
+						}
+						s = i + 1
+						i++
+						goto next_part
+					} else if path[i] == '*' || path[i] == '?' {
+						wild = true
+					}
+					epart = append(epart, path[i])
+				}
+			}
+			parts = append(parts, part{wild: wild, key: string(epart)})
+			goto end_parts
+		} else if path[i] == '.' {
 			parts = append(parts, part{wild: wild, key: path[s:i]})
 			if wild {
 				wild = false
@@ -102,6 +155,7 @@ func Get(json string, path string) Result {
 		}
 	}
 	parts = append(parts, part{wild: wild, key: path[s:]})
+end_parts:
 
 	var i, depth int
 	var squashed string
@@ -129,6 +183,7 @@ func Get(json string, path string) Result {
 
 	stack = append(stack, f)
 
+	// search for key
 read_key:
 	if f.stype == '[' {
 		f.key = strconv.FormatInt(int64(f.count), 10)
@@ -188,36 +243,23 @@ read_key:
 	}
 
 	// read to the value token
+	// there's likely a colon here, but who cares. just burn past it.
 	var val string
 	var vc byte
 	for ; i < len(json); i++ {
-		switch json[i] {
-		case 't', 'f', 'n': // true, false, null
-			vc = json[i]
-			s = i
-			i++
-			for ; i < len(json); i++ {
-				// let's pick up any character. it doesn't matter.
-				if json[i] < 'a' || json[i] > 'z' {
-					break
-				}
-			}
-			val = json[s:i]
-			goto proc_val
-		case '{': // open object
-			i++
-			vc = '{'
-			goto proc_delim
-		case '[': // open array
-			i++
-			vc = '['
-			goto proc_delim
-		case '"': // string
+		if json[i] < '"' { // control character
+			continue
+		}
+		if json[i] < '-' { // string
 			i++
 			// we read the val below
 			vc = '"'
 			goto proc_val
-		case '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9': // number
+		}
+		if json[i] < '[' { // number
+			if json[i] == ':' {
+				continue
+			}
 			vc = '0'
 			s = i
 			i++
@@ -233,6 +275,28 @@ read_key:
 			val = json[s:i]
 			goto proc_val
 		}
+		if json[i] < ']' { // '['
+			i++
+			vc = '['
+			goto proc_delim
+		}
+		if json[i] < 'u' { // true, false, null
+			vc = json[i]
+			s = i
+			i++
+			for ; i < len(json); i++ {
+				// let's pick up any character. it doesn't matter.
+				if json[i] < 'a' || json[i] > 'z' {
+					break
+				}
+			}
+			val = json[s:i]
+			goto proc_val
+		}
+		// must be an open objet
+		i++
+		vc = '{'
+		goto proc_delim
 	}
 
 	// sanity check before we move on
@@ -242,42 +306,45 @@ read_key:
 
 proc_delim:
 	if (matched && depth == len(parts)) || !matched {
+		// -- BEGIN SQUASH -- //
 		// squash the value, ignoring all nested arrays and objects.
 		s = i - 1
 		// the first '[' or '{' has already been read
 		depth := 1
 		for ; i < len(json); i++ {
-			if json[i] == '{' || json[i] == '[' {
-				depth++
-			} else if json[i] == '}' || json[i] == ']' {
-				depth--
-				if depth == 0 {
-					i++
-					break
-				}
-			} else if json[i] == '"' {
-				i++
-				s2 := i
-				for ; i < len(json); i++ {
-					if json[i] == '"' {
-						// look for an escaped slash
-						if json[i-1] == '\\' {
-							n := 0
-							for j := i - 2; j > s2-1; j-- {
-								if json[j] != '\\' {
-									break
-								}
-								n++
-							}
-							if n%2 == 0 {
-								continue
-							}
-						}
+			if json[i] >= '"' && json[i] <= '}' {
+				if json[i] == '{' || json[i] == '[' {
+					depth++
+				} else if json[i] == '}' || json[i] == ']' {
+					depth--
+					if depth == 0 {
+						i++
 						break
 					}
-				}
-				if i == len(json) {
-					break
+				} else if json[i] == '"' {
+					i++
+					s2 := i
+					for ; i < len(json); i++ {
+						if json[i] == '"' {
+							// look for an escaped slash
+							if json[i-1] == '\\' {
+								n := 0
+								for j := i - 2; j > s2-1; j-- {
+									if json[j] != '\\' {
+										break
+									}
+									n++
+								}
+								if n%2 == 0 {
+									continue
+								}
+							}
+							break
+						}
+					}
+					if i == len(json) {
+						break
+					}
 				}
 			}
 		}
@@ -404,6 +471,7 @@ proc_val:
 	return Result{}
 }
 
+// unescape unescapes a string
 func unescape(json string) string { //, error) {
 	var str = make([]byte, 0, len(json))
 	for i := 0; i < len(json); i++ {
@@ -463,6 +531,12 @@ func unescape(json string) string { //, error) {
 	return string(str) //, nil
 }
 
+// Less return true if a token is less than another token.
+// The caseSensitive paramater is used when the tokens are Strings.
+// The order when comparing two different type is:
+//
+//  Null < False < Number < String < True < JSON
+//
 func (t Result) Less(token Result, caseSensitive bool) bool {
 	if t.Type < token.Type {
 		return true
