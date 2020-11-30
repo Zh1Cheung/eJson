@@ -19,15 +19,13 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1e800c1a-28ab-4ba9-b500-10faf012b984" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/eJson.go" beforeDir="false" afterPath="$PROJECT_DIR$/eJson.go" afterDir="false" />
-    </list>
+    <list default="true" id="1e800c1a-28ab-4ba9-b500-10faf012b984" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="GOROOT" path="$USER_HOME$/sdk/go1.15" />
+  <component name="GOROOT" path="$USER_HOME$/sdk/go1.15.5" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -122,9 +120,9 @@
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
+    <option name="version" value="2" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -145,6 +143,10 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
+    <state x="824" y="467" key="#GOROOT" timestamp="1606726207427">
+      <screen x="0" y="23" width="2048" height="1022" />
+    </state>
+    <state x="824" y="467" key="#GOROOT/0.23.2048.1022@0.23.2048.1022" timestamp="1606726207427" />
     <state x="671" y="378" key="#Go_Modules" timestamp="1601858093276">
       <screen x="0" y="23" width="1792" height="1025" />
     </state>
