@@ -2,6 +2,7 @@ package eJson
 
 import "strconv"
 
+// Type is Result type
 type Type byte
 
 const (
@@ -85,10 +86,6 @@ type frame struct {
 	stype byte
 }
 
-// A path is a series of keys seperated by a dot.
-// A key may contain special wildcard characters '*' and '?'.
-// To access an array value use the index as the key.
-// To get the number of elements in an array use the '#' character.
 //  {
 //    "name": {"first": "Tom", "last": "Anderson"},
 //    "age":37,
@@ -105,64 +102,63 @@ func Get(json string, path string) Result {
 	var s int
 	var wild bool
 	var parts = make([]part, 0, 4)
-	var i int
-	var depth int
-	var f frame
-	var matched bool
-	var vc byte
-	var stack = make([]frame, 1, 4)
-	var arrch bool
-	var alogok bool
-	var alogkey string
-	var alog []int
-	var value Result
-	var epart []byte
+
+	// do nothing when no path specified
+	if len(path) == 0 {
+		return Result{} // nothing
+	}
 
 	// parse the path. just split on the dot
 	for i := 0; i < len(path); i++ {
-		if path[i]&0x60 == 0x60 {
-			continue
-		}
-		if path[i] == '.' {
-			// new wild
-			parts = append(parts, part{wild, path[s:i]})
+	next_part:
+		if path[i] == '\\' {
+			// go into escape mode
+			epart := []byte(path[s:i])
+			i++
+			if i < len(path) {
+				epart = append(epart, path[i])
+				i++
+				for ; i < len(path); i++ {
+					if path[i] == '\\' {
+						i++
+						if i < len(path) {
+							epart = append(epart, path[i])
+						}
+						continue
+					} else if path[i] == '.' {
+						parts = append(parts, part{wild: wild, key: string(epart)})
+						if wild {
+							wild = false
+						}
+						s = i + 1
+						i++
+						goto next_part
+					} else if path[i] == '*' || path[i] == '?' {
+						wild = true
+					}
+					epart = append(epart, path[i])
+				}
+			}
+			parts = append(parts, part{wild: wild, key: string(epart)})
+			goto end_parts
+		} else if path[i] == '.' {
+			parts = append(parts, part{wild: wild, key: path[s:i]})
 			if wild {
 				wild = false
 			}
 			s = i + 1
-			continue
-		}
-
-		if (path[i] >= 'A' && path[i] <= 'Z') || (path[i] >= '0' && path[i] <= '9') {
-			continue
-		}
-		if path[i] == '*' || path[i] == '?' {
+		} else if path[i] == '*' || path[i] == '?' {
 			wild = true
-			continue
-		}
-		if path[i] == '#' {
-			arrch = true
-			if s == i && i+1 > len(path) && path[i+1] == '.' {
-				alogok = true
-				alogkey = path[i+2:]
-				path = path[:i+1]
-
-			}
-			continue
-		}
-		if path[i] == '\\' {
-			epart := []byte(path[s:i])
-			parts = append(parts, part{wild, string(epart)})
-			goto end_parts
-		next_part:
-			continue
 		}
 	}
 	parts = append(parts, part{wild: wild, key: path[s:]})
 end_parts:
-	i = 0
 
+	var i, depth int
 	var squashed string
+	var f frame
+	var matched bool
+	var stack = make([]frame, 0, 4)
 
 	depth = 1
 
@@ -246,6 +242,7 @@ read_key:
 	// read to the value token
 	// there's likely a colon here, but who cares. just burn past it.
 	var val string
+	var vc byte
 	for ; i < len(json); i++ {
 		if json[i] < '"' { // control character
 			continue
@@ -531,12 +528,7 @@ func unescape(json string) string { //, error) {
 	return string(str) //, nil
 }
 
-// Less return true if a token is less than another token.
-// The caseSensitive paramater is used when the tokens are Strings.
-// The order when comparing two different type is:
-//
-//  Null < False < Number < String < True < JSON
-//
+// return true if a token is less than another token.
 func (t Result) Less(token Result, caseSensitive bool) bool {
 	if t.Type < token.Type {
 		return true
@@ -594,6 +586,7 @@ func stringLessInsensitive(a, b string) bool {
 	return len(a) < len(b)
 }
 
+// returns true if str matches pattern.
 func wildcardMatch(str, pattern string) bool {
 	if pattern == "*" {
 		return true
